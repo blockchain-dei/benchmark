@@ -7,7 +7,7 @@ dAppsDebug="EHRBlockchain"
 
 
 dAppsArray=("RentRoom" "Attendance" "EHRBlockchain")
-count=
+count=1
 countApp=1
 
 
