@@ -1,0 +1,27 @@
+test:
+  name: Attendance with Bug
+  description: >-
+    Attendance application with Bug.
+  workers:
+    number: 1
+  rounds:
+    - label: Attendance
+      description: Test execution 
+      txNumber: 1
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 5
+      workload:
+        module: benchmarks/scenario/AttendanceOrig/workload.js
+        arguments:
+          ContractName: "AttendanceBug"
+          RoundId: -3
+          QtdStudents: 0
+          QtdTeachers: 0
+monitors:
+    resource:
+    - module: process
+      options:
+       interval: 1
+       processes: [{ command: 'node'  }]

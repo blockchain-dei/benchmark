@@ -1,0 +1,22 @@
+{
+    "caliper": {
+        "blockchain": "ethereum",
+        "command" : {
+            "start": "?",
+            "end" : "?"
+          }
+    },
+    "ethereum": {
+        "url": "ws://localhost:8545",
+        "contractDeployerAddress":"?",
+        "contractDeployerAddressPrivateKey": "?",
+ 	    "contractDeployerAddressPassword": "",
+        "fromAddress": "?",
+        "fromAddressPrivateKey": "?",
+        "fromAddressPassword": "",
+        "transactionConfirmationBlocks": 12
+    }
+}
+
+
+

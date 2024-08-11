@@ -1,0 +1,9 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.2",
+    "hardhat-abi-exporter": "^2.10.1",
+    "mocha": "^10.4.0"
+  }
+}

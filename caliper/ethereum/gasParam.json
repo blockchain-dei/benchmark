@@ -1,0 +1,5 @@
+[
+ {"setReserveRoom": 500000, "setReleaseRoom": 500000, "setAddDaysToPay": 500000 },
+ {"incrementAttendance": 500000, "addHistory": 500000, "getParticularStudent": 500000, "getStudents": 500000, "createTeacher": 500000, "createStudent": 500000 },
+ {"start_visit": 500000, "addDoctors": 500000, "addAudit":  500000 }
+ ]

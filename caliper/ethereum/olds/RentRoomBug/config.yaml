@@ -1,0 +1,27 @@
+test:
+  name: RentRoom With Bug
+  description: >-
+    RentRoom application With Bug.
+  workers:
+    number: 1
+  rounds:
+    - label: ReserveRelease
+      description: Test execution from Reserve to Release Room With Bug
+      txNumber: 1
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 1
+      workload:
+        module: benchmarks/scenario/RentRoomOrig/workload.js
+        arguments:
+          ContractName: "RentRoomBug"
+          RoundId: -3
+          QtdDays: 0
+          QtdUsers: 2
+monitors:
+    resource:
+    - module: process
+      options:
+       interval: 1
+       processes: [{ command: 'node'  }]

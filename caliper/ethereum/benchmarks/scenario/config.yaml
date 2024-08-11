@@ -1,0 +1,31 @@
+test:
+  name: Base config 
+  description: >-
+    Base config.
+  workers:
+    number: 1
+  rounds:
+    - label: Dei Experiment
+      description: Running smart contracts with injected faults
+      txNumber: 1
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 5
+      workload:
+        module: benchmarks/scenario/RentRoomOrig/workload.js
+        arguments:
+          ContractName: "?"
+          RoundId: -3
+          QtdDays: 0
+          QtdUsers: 2
+          QtdStudents: 0
+          QtdTeachers: 0
+          QtdPatients: 0
+          QtdDoctors: 0 
+monitors:
+    resource:
+    - module: process
+      options:
+       interval: 1
+       processes: [{ command: 'node'  }]
