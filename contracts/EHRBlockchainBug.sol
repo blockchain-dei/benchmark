@@ -64,12 +64,17 @@ contract EHRBlockchainBug{
     
     ////////// MODIFIERS ///////////////////
     
-    // initiate  patient data
-    constructor (string memory _firstName, string memory _lastName, string memory _IID, 
-                string memory _bdate, string memory _email, string memory _phone, 
-                string memory _zip, string memory _city, string memory _encryption_key) public
+   // initiate  patient data
+    constructor () public
     {
         owner = msg.sender;
+        
+    }
+
+    function setInfo(string memory _firstName, string memory _lastName, string memory _IID, 
+                string memory _bdate, string memory _email, string memory _phone, 
+                string memory _zip, string memory _city, string memory _encryption_key) public only_owner 
+    {
         firstName = _firstName ;
         lastName = _lastName;
         IID = _IID;

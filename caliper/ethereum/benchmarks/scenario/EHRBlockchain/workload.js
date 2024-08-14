@@ -46,7 +46,10 @@ class appExec extends OperationBase {
       // console.log(this.sutAdapter);
       
       const args = [0,this.QtdUsers,0,0,this.QtdPatients,this.QtdDoctors ]
-   
+      //console.log('Qtd Patients',this.QtdPatients);
+      //console.log('Qtd Patients',this.QtdDoctors);
+      
+
         
         return new ContractState(this.workerIndex, args);
     }
@@ -57,8 +60,8 @@ class appExec extends OperationBase {
      */
     async submitTransaction() {
 
-      console.log('Qtd Patients',this.vQtdPatients);
-      console.log('Qtd Doctors',this.vQtdDoctors);
+      console.log('Qtd Patients',this.ContractState.vQtdPatients);
+      console.log('Qtd Doctors',this.ContractState.vQtdDoctors);
 
       this.startMetrics();
 
@@ -89,7 +92,7 @@ class appExec extends OperationBase {
 
 
       this.stopMetrics();
-
+      
    
     }
 

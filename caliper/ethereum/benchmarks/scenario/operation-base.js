@@ -63,7 +63,9 @@ class OperationBase extends WorkloadModuleBase {
         this.QtdUsers = this.roundArguments.QtdUsers;
         this.QtdStudents = this.roundArguments.QtdStudents;
         this.QtdTeachers = this.roundArguments.QtdTeachers;
-        
+        this.QtdPatients  = this.roundArguments.QtdPatients;
+        this.QtdDoctors  = this.roundArguments.QtdDoctors;
+
         this.ContractState = this.createContractState();
 
         this.cpuStart=0;

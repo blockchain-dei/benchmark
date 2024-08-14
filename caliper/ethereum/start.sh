@@ -18,11 +18,11 @@ for i in "${dAppsArray[@]}"
 do
     
      count=1
-     echo $i
+     #echo $i
     
      jq -c '.[]'  gasParam.json | while read ParamGas; do
         if [ $countApp = $count ]; then 
-             echo "Running dApp -> $i ....  "$ParamGas""
+             #echo "Running dApp -> $i ....  "$ParamGas""
              #echo $i
              #echo $dAppsDebug
               if [ $dAppsDebug = $i ]; then
