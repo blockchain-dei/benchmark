@@ -32,10 +32,10 @@ class OperationBase extends WorkloadModuleBase {
      * Initializes the base class.
      */
 
- 
+
 
     constructor() {
-      
+
         //console.log("Inicializando OperationBase")
         super();
     }
@@ -56,39 +56,39 @@ class OperationBase extends WorkloadModuleBase {
 
         this.assertConnectorType();
         this.assertSetting('ContractName');
-       
+
         this.ContractName = this.roundArguments.ContractName;
         this.RoundId = this.roundArguments.RoundId;
         this.QtdDays = this.roundArguments.QtdDays;
         this.QtdUsers = this.roundArguments.QtdUsers;
         this.QtdStudents = this.roundArguments.QtdStudents;
         this.QtdTeachers = this.roundArguments.QtdTeachers;
-        this.QtdPatients  = this.roundArguments.QtdPatients;
-        this.QtdDoctors  = this.roundArguments.QtdDoctors;
+        this.QtdPatients = this.roundArguments.QtdPatients;
+        this.QtdDoctors = this.roundArguments.QtdDoctors;
 
         this.ContractState = this.createContractState();
 
-        this.cpuStart=0;
-        this.memStart=0;
-        this.memEnds=0;
-        this._cpuUsage =0;
+        this.cpuStart = 0;
+        this.memStart = 0;
+        this.memEnds = 0;
+        this._cpuUsage = 0;
         this._memStart = 0;
         this._memEnd = 0;
 
 
-        this.filePath = '/caliper/ethereum/' +  "/output/" + this.RoundId + "_" +  this.ContractName + ".csv";
-        this.filePathInput = '/caliper/ethereum/' +  "/output/" + this.RoundId + "_I_" +  this.ContractName + ".csv";
-        this.filePathEvent = '/caliper/ethereum/' +  "/output/" + this.RoundId + "_E_" +  this.ContractName + ".csv";
-        this.filePathStorage = '/caliper/ethereum/' +  "/output/" + this.RoundId + "_S_" +  this.ContractName + ".csv";
-        this.filePathFunction = '/caliper/ethereum/' +  "/output/" + this.RoundId + "_F_" +  this.ContractName + ".csv";
+        this.filePath = '/caliper/ethereum/' + "/output/" + this.RoundId + "_" + this.ContractName + ".csv";
+        this.filePathInput = '/caliper/ethereum/' + "/output/" + this.RoundId + "_I_" + this.ContractName + ".csv";
+        this.filePathEvent = '/caliper/ethereum/' + "/output/" + this.RoundId + "_E_" + this.ContractName + ".csv";
+        this.filePathStorage = '/caliper/ethereum/' + "/output/" + this.RoundId + "_S_" + this.ContractName + ".csv";
+        this.filePathFunction = '/caliper/ethereum/' + "/output/" + this.RoundId + "_F_" + this.ContractName + ".csv";
 
-    
-        this.writeStream  = fs.createWriteStream(this.filePath);
+
+        this.writeStream = fs.createWriteStream(this.filePath);
         this.writeStreamInputData = fs.createWriteStream(this.filePathInput);
         this.writeStreamEvent = fs.createWriteStream(this.filePathEvent);
         this.writeStreamStorage = fs.createWriteStream(this.filePathStorage);
-        this.writeStreamFunction  = fs.createWriteStream(this.filePathFunction);
-       
+        this.writeStreamFunction = fs.createWriteStream(this.filePathFunction);
+
         this.writeStream.write(`chain_id;`);
         this.writeStream.write(`roundIndex;`);
         this.writeStream.write(`contract_name;`);
@@ -107,7 +107,7 @@ class OperationBase extends WorkloadModuleBase {
         this.writeStream.write(`mem_start;`);
         this.writeStream.write(`mem_End;`);
         this.writeStream.write(`cpu_usage\n`);
-  
+
         this.writeStreamInputData.write(`roundIndex;`);
         this.writeStreamInputData.write(`contract_name;`);
         this.writeStreamInputData.write(`hash;`);
@@ -121,7 +121,7 @@ class OperationBase extends WorkloadModuleBase {
         this.writeStreamStorage.write(`roundIndex;`);
         this.writeStreamStorage.write(`contract_name;`);
         this.writeStreamStorage.write(`storage_data\n`);
-        
+
         this.writeStreamFunction.write(`roundIndex;`);
         this.writeStreamFunction.write(`contract_name;`);
         this.writeStreamFunction.write(`function_name;`);
@@ -132,7 +132,7 @@ class OperationBase extends WorkloadModuleBase {
         this.writeStreamFunction.write(`result;`);
         this.writeStreamFunction.write(`OpenSCV;`);
         this.writeStreamFunction.write(`errorMsg\n`)
-       
+
         this._chainId;
         this._gasPriceIni;
         this._gasPriceEnd;
@@ -144,8 +144,8 @@ class OperationBase extends WorkloadModuleBase {
         this._numTransInBlockEnd;
         this._gasLimitIni;
         this._gasLimitEnd;
-        this._inputData="";
-        this._storageData="";
+        this._inputData = "";
+        this._storageData = "";
         this._numTransAffected;
         this._fromAddress;
         this._blockNumberIni;
@@ -156,279 +156,312 @@ class OperationBase extends WorkloadModuleBase {
         this._createDate = "";
         this._finalDate = "";
         this._isCommited = "";
-        this._isVerified= "";
-        this._errorMsg= "";
-        this._result="";
+        this._isVerified = "";
+        this._errorMsg = "";
+        this._result = "";
 
     }
 
-    async stopMetrics()
-    {
+    async stopMetrics() {
         this.memEnds = checkMem();
-     
-     
-        await this.cpuStart.then( j=> { this._cpuUsage = j; })
-        await this.memStart.then( j=> {  this._memStart = j });
-        await this.memEnds.then( j=> {  this._memEnd = j });
+
+
+        await this.cpuStart.then(j => { this._cpuUsage = j; })
+        await this.memStart.then(j => { this._memStart = j });
+        await this.memEnds.then(j => { this._memEnd = j });
 
 
 
-       // console.log('Computing Metrics')
-       await this.sutAdapter.web3.eth.getTransactionCount(this._fromAddress).then(m=> { 
-        this._numTransAffected =  m; // Number of transactions affected by the contract running
-    });
-        
-    this._gasPriceEnd = this.sutContext.gasPrice;
-    
-    await this.sutAdapter.web3.eth.getBalance(this._fromAddress).then(m=> { 
-        this._balanceEnd = m; 
-    }); 
+        // console.log('Computing Metrics')
+        await this.sutAdapter.web3.eth.getTransactionCount(this._fromAddress).then(m => {
+            this._numTransAffected = m; // Number of transactions affected by the contract running
+        });
 
-   let _blockEnd; 
+        this._gasPriceEnd = this.sutContext.gasPrice;
 
-   await this.sutAdapter.web3.eth.getBlock('latest').then(m=> { 
-    _blockEnd = m;
-    this._blockNumberEnd = m.number;
-    this._gasLimitEnd = _blockEnd.gasLimit;
-    this._blockSizeEnd = _blockEnd.size;
-    this._numTransInBlockEnd = _blockEnd.transactions.length;
-    }); 
+        await this.sutAdapter.web3.eth.getBalance(this._fromAddress).then(m => {
+            this._balanceEnd = m;
+        });
+
+        let _blockEnd;
+
+        await this.sutAdapter.web3.eth.getBlock('latest').then(m => {
+            _blockEnd = m;
+            this._blockNumberEnd = m.number;
+            this._gasLimitEnd = _blockEnd.gasLimit;
+            this._blockSizeEnd = _blockEnd.size;
+            this._numTransInBlockEnd = _blockEnd.transactions.length;
+        });
 
 
-    for (var i = 0; i < _blockEnd.transactions.length; i++) {
-        await this.sutAdapter.web3.eth.getTransaction(_blockEnd.transactions[i]).then(j=> 
-        { 
-            this._inputData = this._inputData + j.input;
-            this._deployedAddress = j.to; // 
-          
-            this.writeStreamInputData.write(`${this.RoundId};`);
-            this.writeStreamInputData.write(`${this.ContractName};`)
-            this.writeStreamInputData.write(`${j.hash};`)
-            this.writeStreamInputData.write(`${j.input}\n`);
-            
-        }); 
-    }
+        for (var i = 0; i < _blockEnd.transactions.length; i++) {
+            await this.sutAdapter.web3.eth.getTransaction(_blockEnd.transactions[i]).then(j => {
+                this._inputData = this._inputData + j.input;
+                this._deployedAddress = j.to; // 
 
-    //console.log('Passei Pt 2 ');
-  
-    for (var i=this._blockNumberIni; i <= this._blockNumberEnd; i++)
-    {
-        let _block;
-        await this.sutAdapter.web3.eth.getBlock(i).then(m=> { 
-            _block = m;
-            this._gasLimitEnd = _block.gasLimit;
-            this._blockSizeEnd = this._blockSizeEnd + _block.size;
-            this._numTransInBlockEnd = this._numTransInBlockEnd + _block.transactions.length;
-            }); 
+                this.writeStreamInputData.write(`${this.RoundId};`);
+                this.writeStreamInputData.write(`${this.ContractName};`)
+                this.writeStreamInputData.write(`${j.hash};`)
+                this.writeStreamInputData.write(`${j.input}\n`);
+
+            });
+        }
+
+        //console.log('Passei Pt 2 ');
+
+        for (var i = this._blockNumberIni; i <= this._blockNumberEnd; i++) {
+            let _block;
+            await this.sutAdapter.web3.eth.getBlock(i).then(m => {
+                _block = m;
+                this._gasLimitEnd = _block.gasLimit;
+                this._blockSizeEnd = this._blockSizeEnd + _block.size;
+                this._numTransInBlockEnd = this._numTransInBlockEnd + _block.transactions.length;
+            });
 
             //console.log('entre2 ')
             for (var k = 0; k < _block.transactions.length; k++) {
-                await this.sutAdapter.web3.eth.getTransaction(_block.transactions[k]).then(j=> 
-                { 
+                await this.sutAdapter.web3.eth.getTransaction(_block.transactions[k]).then(j => {
                     this._inputData = this._inputData + j.input;
                     this.writeStreamInputData.write(`${this.RoundId};`);
                     this.writeStreamInputData.write(`${this.ContractName};`)
                     this.writeStreamInputData.write(`${j.hash};`)
                     this.writeStreamInputData.write(`${j.input}\n`);
-    
-    
-                }); 
+
+
+                });
             }
+        }
+
+
+        for (let step = 0; step < 20; step++) {
+            //       // Runs 5 times, with values of step 0 through 4.
+            //console.log("Trying getStorageAt" + step);
+            await this.sutAdapter.web3.eth.getStorageAt(this._deployedAddress, step).then(res => {
+                if (res != '0x0000000000000000000000000000000000000000000000000000000000000000') {
+                    //console.log("Storage " + res)
+                    this._storageData = this._storageData + res;
+                    this.writeStreamStorage.write(`${this.RoundId};`);
+                    this.writeStreamStorage.write(`${this.ContractName};`)
+                    this.writeStreamStorage.write(`${res}\n`)
+
+                }
+            })
+
+        }
+
+
+        let _eventRecord = "";
+        if (this.ContractName == 'RentRoomOrig') {
+
+            let _event;
+            let _eventName = "";
+            let _eventRawData = "";
+
+
+
+
+            _event = await this.sutContext.contracts.RentRoomOrig.contract.getPastEvents("allEvents", { fromBlock: 0, toBlock: 'latest' });
+            for (var i = 0; i < _event.length; i++) {
+                _eventName = _event[i].event
+                _eventRawData = _event[i].raw.data;
+                _eventRecord = _eventRecord + "[Data " + _eventName + "]" + _eventRawData
+
+                this.writeStreamEvent.write(`${this.RoundId};`);
+                this.writeStreamEvent.write(`${this.ContractName};`)
+                this.writeStreamEvent.write(`${_eventName};`)
+                this.writeStreamEvent.write(`${_eventRawData}\n`);
+
+            }
+
+        }
+        else if (this.ContractName == 'RentRoomBug') {
+
+            let _event;
+            let _eventName = "";
+            let _eventRawData = "";
+            _event = await this.sutContext.contracts.RentRoomBug.contract.getPastEvents("allEvents", { fromBlock: 0, toBlock: 'latest' });
+            for (var i = 0; i < _event.length; i++) {
+                _eventName = _event[i].event
+                _eventRawData = _event[i].raw.data;
+                _eventRecord = _eventRecord + "[Data " + _eventName + "]" + _eventRawData
+
+                this.writeStreamEvent.write(`${this.RoundId};`);
+                this.writeStreamEvent.write(`${this.ContractName};`)
+                this.writeStreamEvent.write(`${_eventName};`)
+                this.writeStreamEvent.write(`${_eventRawData}\n`);
+
+            }
+
+        }
+
+        else if (this.ContractName == 'EHRBlockchainOrig') {
+
+            let _event;
+            let _eventName = "";
+            let _eventRawData = "";
+            _event = await this.sutContext.contracts.EHRBlockchainOrig.contract.getPastEvents("allEvents", { fromBlock: 0, toBlock: 'latest' });
+            for (var i = 0; i < _event.length; i++) {
+                _eventName = _event[i].event
+                _eventRawData = _event[i].raw.data;
+                _eventRecord = _eventRecord + "[Data " + _eventName + "]" + _eventRawData
+
+                this.writeStreamEvent.write(`${this.RoundId};`);
+                this.writeStreamEvent.write(`${this.ContractName};`)
+                this.writeStreamEvent.write(`${_eventName};`)
+                this.writeStreamEvent.write(`${_eventRawData}\n`);
+
+            }
+
+        }
+
+        else if (this.ContractName == 'EHRBlockchainBug') {
+
+            let _event;
+            let _eventName = "";
+            let _eventRawData = "";
+            _event = await this.sutContext.contracts.EHRBlockchainBug.contract.getPastEvents("allEvents", { fromBlock: 0, toBlock: 'latest' });
+            for (var i = 0; i < _event.length; i++) {
+                _eventName = _event[i].event
+                _eventRawData = _event[i].raw.data;
+                _eventRecord = _eventRecord + "[Data " + _eventName + "]" + _eventRawData
+
+                this.writeStreamEvent.write(`${this.RoundId};`);
+                this.writeStreamEvent.write(`${this.ContractName};`)
+                this.writeStreamEvent.write(`${_eventName};`)
+                this.writeStreamEvent.write(`${_eventRawData}\n`);
+
+            }
+
+        }
+
+
+
+        this.writeStream.write(`${this._chainId};`);
+        this.writeStream.write(`${this.RoundId};`);
+        this.writeStream.write(`${this.ContractName};`);
+        this.writeStream.write(`${this._fromAddress};`);
+        this.writeStream.write(`${this._gasPriceIni};`);
+        this.writeStream.write(`${this._gasPriceEnd};`);
+        this.writeStream.write(`${this._balanceIni};`);
+        this.writeStream.write(`${this._balanceEnd};`);
+        this.writeStream.write(`${this._blockSizeIni};`);
+        this.writeStream.write(`${this._blockSizeEnd};`);
+        this.writeStream.write(`${this._numTransInBlockIni};`);
+        this.writeStream.write(`${this._numTransInBlockEnd};`);
+        this.writeStream.write(`${this._gasLimitIni};`);
+        this.writeStream.write(`${this._gasLimitEnd};`);
+        this.writeStream.write(`${this._numTransAffected};`);
+        this.writeStream.write(`${this._memStart};`);
+        this.writeStream.write(`${this._memEnd};`);
+        this.writeStream.write(`${this._cpuUsage}\n`);
+
+        console.log('Saving data... ');
+        this.writeStream.end();
+        this.writeStreamInputData.end();
+        this.writeStreamEvent.end();
+        this.writeStreamStorage.end();
+        this.writeStreamFunction.end();
     }
 
- 
-    for (let step = 0; step < 20; step++) {
-        //       // Runs 5 times, with values of step 0 through 4.
-               //console.log("Trying getStorageAt" + step);
-               await this.sutAdapter.web3.eth.getStorageAt(this._deployedAddress, step).then(res=>{ 
-               if (res!='0x0000000000000000000000000000000000000000000000000000000000000000')
-                   {
-                      //console.log("Storage " + res)
-                      this._storageData = this._storageData + res;
-                      this.writeStreamStorage.write(`${this.RoundId};`);
-                      this.writeStreamStorage.write(`${this.ContractName};`)
-                      this.writeStreamStorage.write(`${res}\n`)
 
-                  }
-                 }) 
-   
-             }
-
-   
-  let _eventRecord="";
-  if (this.ContractName=='RentRoomOrig')
-  {
-   
-    let _event;
-    let _eventName="";
-    let _eventRawData="";
-
-  
-
-  
-    _event = await this.sutContext.contracts.RentRoomOrig.contract.getPastEvents("allEvents",  {fromBlock: 0, toBlock: 'latest'});
-    for (var i=0; i < _event.length; i++)
-    {
-      _eventName = _event[i].event
-      _eventRawData = _event[i].raw.data;
-      _eventRecord = _eventRecord + "[Data " + _eventName + "]" + _eventRawData 
-
-      this.writeStreamEvent.write(`${this.RoundId};`);
-      this.writeStreamEvent.write(`${this.ContractName};`)
-      this.writeStreamEvent.write(`${_eventName};`)
-      this.writeStreamEvent.write(`${_eventRawData}\n`);
-
-    }
-
-  }
-  else if (this.ContractName=='RentRoomBug')
-  {
-   
-    let _event;
-    let _eventName="";
-    let _eventRawData="";
-    _event = await this.sutContext.contracts.RentRoomBug.contract.getPastEvents("allEvents",  {fromBlock: 0, toBlock: 'latest'});
-    for (var i=0; i < _event.length; i++)
-    {
-      _eventName = _event[i].event
-      _eventRawData = _event[i].raw.data;
-      _eventRecord = _eventRecord + "[Data " + _eventName + "]" + _eventRawData 
-
-      this.writeStreamEvent.write(`${this.RoundId};`);
-      this.writeStreamEvent.write(`${this.ContractName};`)
-      this.writeStreamEvent.write(`${_eventName};`)
-      this.writeStreamEvent.write(`${_eventRawData}\n`);
-
-    }
-
-  }
-
-
-         
-    this.writeStream.write(`${this._chainId};`);
-    this.writeStream.write(`${this.RoundId};`);
-    this.writeStream.write(`${this.ContractName};`);
-    this.writeStream.write(`${this._fromAddress};`);
-    this.writeStream.write(`${this._gasPriceIni};`);
-    this.writeStream.write(`${this._gasPriceEnd};`);
-    this.writeStream.write(`${this._balanceIni};`);
-    this.writeStream.write(`${this._balanceEnd};`);
-    this.writeStream.write(`${this._blockSizeIni};`);
-    this.writeStream.write(`${this._blockSizeEnd};`);
-    this.writeStream.write(`${this._numTransInBlockIni};`);
-    this.writeStream.write(`${this._numTransInBlockEnd};`);
-    this.writeStream.write(`${this._gasLimitIni};`);
-    this.writeStream.write(`${this._gasLimitEnd};`);
-    this.writeStream.write(`${this._numTransAffected};`);
-    this.writeStream.write(`${this._memStart};`);
-    this.writeStream.write(`${this._memEnd};`);
-    this.writeStream.write(`${this._cpuUsage}\n`);
-
-    console.log('Saving data... ');
-    this.writeStream.end();
-    this.writeStreamInputData.end();
-    this.writeStreamEvent.end();
-    this.writeStreamStorage.end();
-    this.writeStreamFunction.end();
-    }
-  
-
-    startMetrics()
-    {
+    startMetrics() {
         this.memStart = checkMem();
         this.cpuStart = checkCPU(1000);
-  
-  
-        this._fromAddress =  this.sutContext.fromAddress; 
-        this._chainId =this.sutContext.chainId;
-        this._gasPriceIni = this.sutContext.gasPrice; 
-            
-        this.sutAdapter.web3.eth.getBalance(this._fromAddress).then(m=> { 
-        this._balanceIni = m;  
+
+
+        this._fromAddress = this.sutContext.fromAddress;
+        this._chainId = this.sutContext.chainId;
+        this._gasPriceIni = this.sutContext.gasPrice;
+
+        this.sutAdapter.web3.eth.getBalance(this._fromAddress).then(m => {
+            this._balanceIni = m;
         });
-  
-        
-          this.sutAdapter.web3.eth.getBlock('latest').then(m=> { 
-              this._blockSizeIni = m.size;
-              this._numTransInBlockIni = m.transactions.length;
-              this._gasLimitIni = m.gasLimit;
-              this._blockNumberIni = m.number;
-    
-          }); 
+
+
+        this.sutAdapter.web3.eth.getBlock('latest').then(m => {
+            this._blockSizeIni = m.size;
+            this._numTransInBlockIni = m.transactions.length;
+            this._gasLimitIni = m.gasLimit;
+            this._blockNumberIni = m.number;
+
+        });
     }
 
-    async sendExecFunction(pFunctionName,pParamArgs, pOpenSCV, pWei)
-    {
-     // console.log(pFunctionName);
-     // console.log(pParamArgs);
-      
+    async sendExecFunction(pFunctionName, pParamArgs, pOpenSCV, pWei) {
+        // console.log(pFunctionName);
+        // console.log(pParamArgs);
 
-      if (pWei==undefined) 
-      {
-        //console.log('aki');
-        await this.sutAdapter.sendRequests(this.createConnectorRequest(pFunctionName,pParamArgs)).then(m=> { 
-            this._createDate =  m.GetTimeCreate();
-            this._finalDate =   m.GetTimeFinal();
-            this._isCommited =  m.IsCommitted();
-            this._isVerified =  m.IsVerified();
-            this._errorMsg =    m.GetErrMsg();
-            
-            this.writeStreamFunction.write(`${this.RoundId};`);
-            this.writeStreamFunction.write(`${this.ContractName};`);
-            this.writeStreamFunction.write(`${pFunctionName};`);
-            this.writeStreamFunction.write(`${this._createDate};`);
-            this.writeStreamFunction.write(`${this._finalDate};`);
-            this.writeStreamFunction.write(`${this._isCommited};`);
-            this.writeStreamFunction.write(`${this._isVerified};`);
-            this.writeStreamFunction.write(`${this._result};`);
-            this.writeStreamFunction.write(`${pOpenSCV};`);
-            this.writeStreamFunction.write(`${this._errorMsg}\n`);});
+
+        if (pWei == undefined) {
+            //console.log('aki');
+            await this.sutAdapter.sendRequests(this.createConnectorRequest(pFunctionName, pParamArgs)).then(m => {
+                this._createDate = m.GetTimeCreate();
+                this._finalDate = m.GetTimeFinal();
+                this._isCommited = m.IsCommitted();
+                this._isVerified = m.IsVerified();
+                this._errorMsg = m.GetErrMsg();
+
+                //console.log('GetResult', m.GetResult());
+
+                //console.log(m);
+                this.writeStreamFunction.write(`${this.RoundId};`);
+                this.writeStreamFunction.write(`${this.ContractName};`);
+                this.writeStreamFunction.write(`${pFunctionName};`);
+                this.writeStreamFunction.write(`${this._createDate};`);
+                this.writeStreamFunction.write(`${this._finalDate};`);
+                this.writeStreamFunction.write(`${this._isCommited};`);
+                this.writeStreamFunction.write(`${this._isVerified};`);
+                this.writeStreamFunction.write(`${this._result};`);
+                this.writeStreamFunction.write(`${pOpenSCV};`);
+                this.writeStreamFunction.write(`${this._errorMsg}\n`);
+            });
         }
-        else if (pWei == "Query")
-        {
-            await this.sutAdapter.sendRequests(this.createConnectorRequest(pFunctionName,pParamArgs, [], true)).then(m=> { 
-            this._result =  m.status.result;
-            //console.log(m);
-            //console.log(pFunctionName, this._result);
+        else if (pWei == "Query") {
+            await this.sutAdapter.sendRequests(this.createConnectorRequest(pFunctionName, pParamArgs, [], true)).then(m => {
+                this._result = m.status.result;
+                //console.log(m);
+                //console.log(pFunctionName, this._result);
 
-            this._createDate =  m.GetTimeCreate();
-            this._finalDate =   m.GetTimeFinal();
-            this._isCommited =  m.IsCommitted();
-            this._isVerified =  m.IsVerified();
-            this._errorMsg =    m.GetErrMsg();
-            
-            this.writeStreamFunction.write(`${this.RoundId};`);
-            this.writeStreamFunction.write(`${this.ContractName};`);
-            this.writeStreamFunction.write(`${pFunctionName};`);
-            this.writeStreamFunction.write(`${this._createDate};`);
-            this.writeStreamFunction.write(`${this._finalDate};`);
-            this.writeStreamFunction.write(`${this._isCommited};`);
-            this.writeStreamFunction.write(`${this._isVerified};`);
-            this.writeStreamFunction.write(`${this._result};`);
-            this.writeStreamFunction.write(`${pOpenSCV};`);
-            this.writeStreamFunction.write(`${this._errorMsg}\n`);});
+                this._createDate = m.GetTimeCreate();
+                this._finalDate = m.GetTimeFinal();
+                this._isCommited = m.IsCommitted();
+                this._isVerified = m.IsVerified();
+                this._errorMsg = m.GetErrMsg();
+
+                this.writeStreamFunction.write(`${this.RoundId};`);
+                this.writeStreamFunction.write(`${this.ContractName};`);
+                this.writeStreamFunction.write(`${pFunctionName};`);
+                this.writeStreamFunction.write(`${this._createDate};`);
+                this.writeStreamFunction.write(`${this._finalDate};`);
+                this.writeStreamFunction.write(`${this._isCommited};`);
+                this.writeStreamFunction.write(`${this._isVerified};`);
+                this.writeStreamFunction.write(`${this._result};`);
+                this.writeStreamFunction.write(`${pOpenSCV};`);
+                this.writeStreamFunction.write(`${this._errorMsg}\n`);
+
+            });
             return this._result;
         }
-      else
-      {
-        await this.sutAdapter.sendRequests(this.createConnectorRequest(pFunctionName,pParamArgs, pWei,false)).then(m=> { 
-            //console.log(m);
-            this._createDate =  m.GetTimeCreate();
-            this._finalDate =   m.GetTimeFinal();
-            this._isCommited =  m.IsCommitted();
-            this._isVerified =  m.IsVerified();
-            this._errorMsg =    m.GetErrMsg();
-            
-            this.writeStreamFunction.write(`${this.RoundId};`);
-            this.writeStreamFunction.write(`${this.ContractName};`);
-            this.writeStreamFunction.write(`${pFunctionName};`);
-            this.writeStreamFunction.write(`${this._createDate};`);
-            this.writeStreamFunction.write(`${this._finalDate};`);
-            this.writeStreamFunction.write(`${this._isCommited};`);
-            this.writeStreamFunction.write(`${this._isVerified};`);
-            this.writeStreamFunction.write(`${this._result};`);
-            this.writeStreamFunction.write(`${pOpenSCV};`);
-            this.writeStreamFunction.write(`${this._errorMsg}\n`);});
+        else {
+            await this.sutAdapter.sendRequests(this.createConnectorRequest(pFunctionName, pParamArgs, pWei, false)).then(m => {
+                //console.log(m);
+                this._createDate = m.GetTimeCreate();
+                this._finalDate = m.GetTimeFinal();
+                this._isCommited = m.IsCommitted();
+                this._isVerified = m.IsVerified();
+                this._errorMsg = m.GetErrMsg();
+
+                this.writeStreamFunction.write(`${this.RoundId};`);
+                this.writeStreamFunction.write(`${this.ContractName};`);
+                this.writeStreamFunction.write(`${pFunctionName};`);
+                this.writeStreamFunction.write(`${this._createDate};`);
+                this.writeStreamFunction.write(`${this._finalDate};`);
+                this.writeStreamFunction.write(`${this._isCommited};`);
+                this.writeStreamFunction.write(`${this._isVerified};`);
+                this.writeStreamFunction.write(`${this._result};`);
+                this.writeStreamFunction.write(`${pOpenSCV};`);
+                this.writeStreamFunction.write(`${this._errorMsg}\n`);
+            });
         }
     }
 
@@ -459,7 +492,7 @@ class OperationBase extends WorkloadModuleBase {
      * @protected
      */
     assertSetting(settingName) {
-        if(!this.roundArguments.hasOwnProperty(settingName)) {
+        if (!this.roundArguments.hasOwnProperty(settingName)) {
             throw new Error(`Workload error: module setting "${settingName}" is missing from the benchmark configuration file`);
         }
     }
@@ -474,7 +507,7 @@ class OperationBase extends WorkloadModuleBase {
     createConnectorRequest(operation, args, value, query) {
         switch (this.connectorType) {
             case 'ethereum':
-                return this._createEthereumConnectorRequest(operation, args, value,query);
+                return this._createEthereumConnectorRequest(operation, args, value, query);
             default:
                 // this shouldn't happen
                 throw new Error(`Connector type ${this.connectorType} is not supported by the benchmark`);
@@ -491,45 +524,43 @@ class OperationBase extends WorkloadModuleBase {
     _createEthereumConnectorRequest(operation, args, _value, _query) {
         //console.log("Contract Name " +  this.ContractName)
         //const query = operation === 'query';
-       // console.log("Payable Function " + _value);
-       // console.log(hre.ethers.parseEther("0.00001"));
-       // console.log(ethers.utils.formatEther("Value "+  _value));
-        if (_query==true) 
-        {
-                return {
-                    contract: this.ContractName,
-                    verb: operation,
-                    //value: _value, // hre.ethers.parseEther("0.00001"),
-                    args: Object.keys(args).map(k => args[k]),
-                    readOnly: true,
-                
-                }
-         }
-        else
-        {
+        // console.log("Payable Function " + _value);
+        // console.log(hre.ethers.parseEther("0.00001"));
+        // console.log(ethers.utils.formatEther("Value "+  _value));
+        if (_query == true) {
+            return {
+                contract: this.ContractName,
+                verb: operation,
+                //value: _value, // hre.ethers.parseEther("0.00001"),
+                args: Object.keys(args).map(k => args[k]),
+                readOnly: true,
+
+            }
+        }
+        else {
             return {
                 contract: this.ContractName,
                 verb: operation,
                 value: _value, // hre.ethers.parseEther("0.00001"),
                 args: Object.keys(args).map(k => args[k]),
-               // readOnly: false,
+                // readOnly: false,
             }
         }
 
-       
-       
+
+
     }
 }
 
 async function checkMem() {
     const memUsage = await mem.info();
-    return  (memUsage['usedMemMb'] );
-   }
+    return (memUsage['usedMemMb']);
+}
 
 
 async function checkCPU(interval) {
-    const cpuUsage =  cpu.usage(interval);
+    const cpuUsage = cpu.usage(interval);
     return (cpuUsage);
-   }
+}
 
 module.exports = OperationBase;

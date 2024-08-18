@@ -1,5 +1,5 @@
 [
  {"setReserveRoom": 500000, "setReleaseRoom": 500000, "setAddDaysToPay": 500000 },
  {"incrementAttendance": 500000, "addHistory": 500000, "getParticularStudent": 500000, "getStudents": 500000, "createTeacher": 500000, "createStudent": 500000 },
- {"start_visit": 500000, "addDoctors": 500000, "addAudit":  500000 }
+ {"start_visit": 500000, "addDoctors": 500000, "addAudit":  500000, "get_record_details": 500000, "print_record": 500000,"doctor_update_record": 500000,  "doctor_query_record": 500000,"doctor_print_record": 500000, "doctor_copy_record": 500000, "doctor_delete_record": 500000, "delete_record": 500000 }
  ]

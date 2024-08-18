@@ -4,9 +4,9 @@ contract EHRBlockchainBug{
     
     /////////// VARIABLES ///////////////////
     
-
     // address
     address owner;
+     address public vMsgSender;
     
     //identity
     string private firstName;
@@ -15,7 +15,6 @@ contract EHRBlockchainBug{
     
     //birthday
     string private bdate;
-    
     
     //contract
     string private email;
@@ -64,12 +63,18 @@ contract EHRBlockchainBug{
     
     ////////// MODIFIERS ///////////////////
     
-   // initiate  patient data
+    // initiate  patient data
     constructor () public
     {
         owner = msg.sender;
         
     }
+
+      function setMsgSender(address _Sender) public
+     {
+        vMsgSender = _Sender;
+        owner = _Sender;
+     }
 
     function setInfo(string memory _firstName, string memory _lastName, string memory _IID, 
                 string memory _bdate, string memory _email, string memory _phone, 
@@ -88,7 +93,7 @@ contract EHRBlockchainBug{
     
     // make the patient using this contractt only owner
     modifier only_owner(){
-        require(owner == msg.sender);
+        require(owner == vMsgSender, 'Only owner can execute this function');
         _;
     }
     
@@ -158,14 +163,19 @@ contract EHRBlockchainBug{
         uint record_time
         );
     
+
+    function setCreatePatientID() view public  returns (address)
+    {
+         return  address(uint256(sha256(abi.encodePacked(vMsgSender, now))));
+    }
+
     ////////////// EVENTS END////////////////
     
     ////////// PATIENT FUNCTIONS //////////////
     
     // create a medical record with unique id
     // patient makes appointment
-    function start_visit(uint _time) public only_owner returns (address){
-        address unique_id = address(uint256(sha256(abi.encodePacked(msg.sender, now))));
+    function start_visit(address unique_id,uint _time) public only_owner returns (address){
         record_mapping[unique_id].is_uid_generated = true;
         record_mapping[unique_id].record_id = uint256(unique_id);
         record_mapping[unique_id].record_msg = "New Medical Record is created";
@@ -173,14 +183,13 @@ contract EHRBlockchainBug{
         
         record_mapping[unique_id].record_details = "Visit initiate";
         
-        record_mapping[unique_id].patient_address = msg.sender;
+        record_mapping[unique_id].patient_address = vMsgSender;
         record_mapping[unique_id].record_time = _time;
         emit event_start_visit(
             unique_id,
             record_mapping[unique_id].record_msg,
             record_mapping[unique_id].record_status, 
             record_mapping[unique_id].record_time);
-        return unique_id;
     }
     
     // give permissions to doctors -- authorize doctors
@@ -231,24 +240,24 @@ contract EHRBlockchainBug{
     //////////// PATIENT FUNCTIONS END ///////////
     
     /////////// GET MEDICAL RECORDS /////////////
+     /////////// GET MEDICAL RECORDS /////////////
     function get_record_details(address _unique_id) view public returns (string memory) {
-        require(record_mapping[_unique_id].is_uid_generated == true);
-        require(record_mapping[_unique_id].record_status!=1);
-        if(record_mapping[_unique_id].patient_address == msg.sender){
-            require(record_mapping[_unique_id].patient_address == msg.sender);
-            return record_mapping[_unique_id].record_details;
+        require(record_mapping[_unique_id].is_uid_generated == true,"Record ID not found");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
+        if(record_mapping[_unique_id].patient_address == vMsgSender){
+            require(record_mapping[_unique_id].patient_address == vMsgSender,"You are not the patient");
+            return record_mapping[_unique_id].record_msg;
         }
-        if(doctors[msg.sender]){
-            require(doctors[msg.sender], "Not working");
-            return record_mapping[_unique_id].record_details;
+        if(doctors[vMsgSender]){
+            require(doctors[vMsgSender], "Not working");
+            return record_mapping[_unique_id].record_msg;
         }
-         if(audits[msg.sender]){
-            require(audits[msg.sender], "Not working");
-            return record_mapping[_unique_id].record_details;
+         if(audits[vMsgSender]){
+            require(audits[vMsgSender], "Not working");
+            return record_mapping[_unique_id].record_msg;
         }
         return "You have no authorization.";
     }
-    
     /////////// END GET MEDICAL RECORDS /////////
 
     
@@ -256,9 +265,9 @@ contract EHRBlockchainBug{
     
     // patient can delete his/her medical record
     function delete_record(address _unique_id) public returns (string memory){
-        require(record_mapping[_unique_id].is_uid_generated == true);
-        require(record_mapping[_unique_id].patient_address == msg.sender);
-        require(record_mapping[_unique_id].record_status!=1);
+        require(record_mapping[_unique_id].is_uid_generated == true, "Record ID not found");
+        require(record_mapping[_unique_id].patient_address == vMsgSender,"You are not the patient");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
          
         record_mapping[_unique_id].record_details = "";
         record_mapping[_unique_id].record_time = now;
@@ -277,9 +286,9 @@ contract EHRBlockchainBug{
     
     // patient can print his/her medical record
     function print_record(address _unique_id) public returns (string memory){
-        require(record_mapping[_unique_id].is_uid_generated == true);
-        require(record_mapping[_unique_id].patient_address == msg.sender);
-        require(record_mapping[_unique_id].record_status!=1);
+        require(record_mapping[_unique_id].is_uid_generated == true, "Record ID not found");
+        require(record_mapping[_unique_id].patient_address == vMsgSender,"You are not the patient");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
          
         record_mapping[_unique_id].record_time = now;
 
@@ -295,11 +304,11 @@ contract EHRBlockchainBug{
     // check
     // doctor deletes medical record
     function doctor_delete_record(address _unique_id) public returns (string memory){
-        require(record_mapping[_unique_id].is_uid_generated);
-        require(doctors[msg.sender]);
-        require(record_mapping[_unique_id].record_status!=1);
+        require(record_mapping[_unique_id].is_uid_generated, "Record ID not found");
+        require(doctors[vMsgSender],"You are not the doctor");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
     
-        record_mapping[_unique_id].doctor = msg.sender;
+        record_mapping[_unique_id].doctor = vMsgSender;
         record_mapping[_unique_id].doctor_time = now;
         
         record_mapping[_unique_id].record_details = "";
@@ -314,11 +323,13 @@ contract EHRBlockchainBug{
     
     // doctor prints medical record
     function doctor_print_record(address _unique_id) public returns (string memory){
-        require(record_mapping[_unique_id].is_uid_generated);
-        require(doctors[msg.sender]);
-        require(record_mapping[_unique_id].record_status!=1);
+      
+        require(record_mapping[_unique_id].is_uid_generated, "Record ID not found");
+        require(doctors[vMsgSender],"You are not the doctor");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
+
     
-        record_mapping[_unique_id].doctor = msg.sender;
+        record_mapping[_unique_id].doctor = vMsgSender;
         record_mapping[_unique_id].doctor_time = now;
         
         record_mapping[_unique_id].record_status = 4;
@@ -332,11 +343,11 @@ contract EHRBlockchainBug{
     
     // doctor query medical record
     function doctor_query_record(address _unique_id) public returns (string memory){
-        require(record_mapping[_unique_id].is_uid_generated);
-        require(doctors[msg.sender]);
-        require(record_mapping[_unique_id].record_status!=1);
+        require(record_mapping[_unique_id].is_uid_generated, "Record ID not found");
+        require(doctors[vMsgSender],"You are not the doctor");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
     
-        record_mapping[_unique_id].doctor = msg.sender;
+        record_mapping[_unique_id].doctor = vMsgSender;
         record_mapping[_unique_id].doctor_time = now;
         
         record_mapping[_unique_id].record_status = 3;
@@ -350,11 +361,11 @@ contract EHRBlockchainBug{
     
     // doctor copy medical record
     function doctor_copy_record(address _unique_id) public returns (string memory){
-        require(record_mapping[_unique_id].is_uid_generated);
-        require(doctors[msg.sender] || audits[msg.sender], "Not working");
-        require(record_mapping[_unique_id].record_status!=1);
+        require(record_mapping[_unique_id].is_uid_generated, "Record ID not found");
+        require(doctors[vMsgSender] || audits[vMsgSender], "Not working");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
     
-        record_mapping[_unique_id].doctor = msg.sender;
+        record_mapping[_unique_id].doctor = vMsgSender;
         record_mapping[_unique_id].doctor_time = now;
         
         record_mapping[_unique_id].record_status = 5;
@@ -368,11 +379,11 @@ contract EHRBlockchainBug{
     
      // doctor update medical record
     function doctor_update_record(address _unique_id, string memory _update) public returns (string memory){
-        require(record_mapping[_unique_id].is_uid_generated);
-        require(doctors[msg.sender]);
-        require(record_mapping[_unique_id].record_status!=1);
+        require(record_mapping[_unique_id].is_uid_generated, "Record ID not found");
+        require(doctors[vMsgSender],"You are not the doctor");
+        require(record_mapping[_unique_id].record_status!=1,"Record Status Error");
     
-        record_mapping[_unique_id].doctor = msg.sender;
+        record_mapping[_unique_id].doctor = vMsgSender;
         record_mapping[_unique_id].doctor_time = now;
         record_mapping[_unique_id].record_details = _update;
         record_mapping[_unique_id].record_status = 5;
